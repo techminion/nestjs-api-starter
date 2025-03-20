@@ -1,5 +1,6 @@
 import { ConsoleLogger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { constants } from './config/constants';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
@@ -28,6 +29,15 @@ async function bootstrap() {
 
   // Apply global error handler
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  //  Set up Swagger
+  const config = new DocumentBuilder()
+    .setTitle(constants.app.name as string)
+    .setDescription('API description')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
   await app.listen(constants.app.port ?? 3000);
 }
 bootstrap();
