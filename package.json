@@ -1,10 +1,12 @@
 {
   "name": "nestjs-api-starter",
   "version": "0.0.1",
-  "description": "",
+  "description": "A NestJS API starter template with authentication and best practices.",
+  "bin": {
+    "nestjs-api-starter": "./bin/create-app.js"
+  },
   "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
