@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
 import { Public } from 'src/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -8,6 +8,7 @@ import { AuthResponse } from './interface/auth-response.interface';
 @Public()
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
   constructor(private authService: AuthService) {}
 
   @Post('login')
@@ -18,5 +19,11 @@ export class AuthController {
   @Post('signup')
   async signUp(@Body() createUserDto: CreateUserDto): Promise<AuthResponse> {
     return this.authService.signUp(createUserDto);
+  }
+
+  @Get('verify')
+  async verifyEmail(@Query('token') token: string) {
+    this.logger.log('got the reqest', token);
+    return this.authService.verifyEmail(token);
   }
 }

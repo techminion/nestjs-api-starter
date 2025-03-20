@@ -24,4 +24,13 @@ export class UsersService {
     });
     return newUser.save();
   }
+
+  async updateUser(
+    email: string,
+    updateDate: Partial<User>,
+  ): Promise<UserDocument | null> {
+    return this.userModel
+      .findOneAndUpdate({ email }, updateDate, { new: true })
+      .exec();
+  }
 }

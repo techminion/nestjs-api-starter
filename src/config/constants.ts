@@ -14,4 +14,14 @@ export const constants = {
     expire: process.env.JWT_EXPIRE,
     timeUnit: process.env.JWT_TIME_UNIT,
   },
+  smtp: {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    username: process.env.SMTP_EMAIL,
+    password: process.env.SMTP_PASSWORD,
+  },
+  email: {
+    from: process.env.FROM_EMAIL,
+    fromName: process.env.FROM_NAME,
+  },
 };

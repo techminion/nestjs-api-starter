@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 
 import { ConfigModule } from '@nestjs/config';
-import { constants } from 'src/config/configuration';
+import { constants } from 'src/config/constants';
 
 @Module({
   imports: [
