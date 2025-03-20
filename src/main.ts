@@ -1,6 +1,9 @@
 import { ConsoleLogger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { constants } from './config/constants';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { ResponseInterceptor } from './interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -8,7 +11,14 @@ async function bootstrap() {
       prefix: 'ConquerAPI',
     }),
   });
+  // Enable global validation
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(process.env.PORT ?? 3000);
+
+  // Apply global response interceptor
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // Apply global error handler
+  app.useGlobalFilters(new HttpExceptionFilter());
+  await app.listen(constants.app.port ?? 3000);
 }
 bootstrap();
