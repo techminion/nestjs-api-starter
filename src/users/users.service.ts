@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
@@ -15,13 +16,26 @@ export class UsersService {
 
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
+  async getUserProfile(email: string): Promise<Partial<UserDocument>> {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    const { password, ...userProfile } = user.toObject();
+    return userProfile;
+  }
+
   async findByEmail(email: string): Promise<UserDocument | null> {
     try {
-      const user = await this.userModel.findOne({ email }).exec();
-      this.logger.log(`User data fetched: ${JSON.stringify(user)}`);
+      const user = await this.userModel.findOne({ email }).lean().exec();
+      if (!user) {
+        this.logger.warn(`User not found for email: ${email}`);
+      } else {
+        this.logger.log(`User data fetched successfully for email: ${email}`);
+      }
       return user;
     } catch (error) {
-      this.logger.error(`Error fetching user by email: ${email}`, error);
+      this.logger.error(`Error fetching user by email: ${email} - ${error.message}`);
       throw new InternalServerErrorException('Failed to fetch user data');
     }
   }
@@ -51,7 +65,7 @@ export class UsersService {
     }
   }
 
-  async updateUser(email: string, updateData: Partial<UserDocument>): Promise<UserDocument | null> {
+  async updateUser(email: string, updateData: Partial<User>): Promise<UserDocument | null> {
     try {
       const updatedUser = await this.userModel
         .findOneAndUpdate({ email }, updateData, { new: true })
