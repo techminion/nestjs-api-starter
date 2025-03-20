@@ -5,7 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Public()
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
   constructor(private authService: AuthService) {}

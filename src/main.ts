@@ -1,4 +1,4 @@
-import { ConsoleLogger, ValidationPipe } from '@nestjs/common';
+import { ConsoleLogger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { constants } from './config/constants';
@@ -11,6 +11,15 @@ async function bootstrap() {
       prefix: 'ConquerAPI',
     }),
   });
+
+  // Set app prefix
+  app.setGlobalPrefix(constants.app.apiPrefix || 'api');
+
+  // Enabling API versioning
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
+
   // Enable global validation
   app.useGlobalPipes(new ValidationPipe());
 

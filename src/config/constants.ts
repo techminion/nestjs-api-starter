@@ -5,6 +5,7 @@ export const constants = {
     name: process.env.APPNAME,
     version: process.env.APPVERSION,
     port: process.env.APP_PORT,
+    apiPrefix: process.env.API_PREFIX,
   },
   mongodb: {
     uri: process.env.MONGO_URI,
