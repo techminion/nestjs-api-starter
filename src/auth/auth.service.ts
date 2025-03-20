@@ -1,5 +1,11 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { constants } from 'src/config/constants';
@@ -76,6 +82,47 @@ export class AuthService {
       return { message: 'Email verified successfully', data: { email: user.email, newToken } };
     } catch (err) {
       this.logger.error(err);
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
+  async forgotPassword(email: string): Promise<BaseResponse<null>> {
+    try {
+      const user = await this.userService.findByEmail(email);
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+
+      const token: string = this.jwtService.sign({ email }, { expiresIn: '15m' });
+      await this.sendEmail(
+        email,
+        'Reset Password',
+        `Click here to reset your password: http://localhost:3000/auth/reset-password?token=${token}`,
+      );
+
+      return { message: 'Check your email for password reset link', data: null };
+    } catch (error) {
+      this.logger.error(`Error in forgotPassword for email ${email}:`, error);
+      throw new InternalServerErrorException('Failed to process forgot password request');
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<BaseResponse<null>> {
+    try {
+      const payload: { email: string } = this.jwtService.verify(token);
+      const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+
+      const updatedUser = await this.userService.updateUser(payload.email, {
+        password: hashedPassword,
+      });
+
+      if (!updatedUser) {
+        throw new BadRequestException('User not found or update failed');
+      }
+
+      return { message: 'Password reset successful', data: null };
+    } catch (error) {
+      this.logger.error('Error in resetPassword:', error);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }

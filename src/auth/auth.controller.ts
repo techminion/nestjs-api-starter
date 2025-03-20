@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -41,5 +41,33 @@ export class AuthController {
   async verifyEmail(@Query('token') token: string) {
     this.logger.log('Received verification request', token);
     return this.authService.verifyEmail(token);
+  }
+
+  @ApiOperation({
+    summary: 'Forgot Password',
+    description: "Sends a password reset link to the user's email.",
+  })
+  @ApiResponse({ status: 200, description: 'Check your email for password reset link' })
+  @ApiResponse({ status: 400, description: 'User not found' })
+  @ApiBody({ schema: { properties: { email: { type: 'string', example: 'user@example.com' } } } })
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: { email: string }) {
+    return this.authService.forgotPassword(body.email);
+  }
+
+  @ApiOperation({
+    summary: 'Reset Password',
+    description: 'Resets user password using a valid token.',
+  })
+  @ApiResponse({ status: 200, description: 'Password reset successful' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  @ApiBody({
+    schema: {
+      properties: { token: { type: 'string' }, newPassword: { type: 'string', minLength: 6 } },
+    },
+  })
+  @Post('reset-password')
+  async resetPassword(@Body() body: { token: string; newPassword: string }) {
+    return this.authService.resetPassword(body.token, body.newPassword);
   }
 }
