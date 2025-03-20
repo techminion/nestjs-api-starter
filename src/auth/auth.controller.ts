@@ -70,4 +70,16 @@ export class AuthController {
   async resetPassword(@Body() body: { token: string; newPassword: string }) {
     return this.authService.resetPassword(body.token, body.newPassword);
   }
+
+  @ApiOperation({
+    summary: 'Refresh Token',
+    description: 'Generates a new access token using a valid refresh token.',
+  })
+  @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
+  @ApiBody({ schema: { properties: { refreshToken: { type: 'string' } } } })
+  @Post('refresh-token')
+  async refreshToken(@Body() body: { refreshToken: string }) {
+    return this.authService.refreshToken(body.refreshToken);
+  }
 }

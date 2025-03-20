@@ -37,14 +37,45 @@ export class AuthService {
 
   async login(
     loginDto: LoginDto,
-  ): Promise<BaseResponse<{ token: string; user: Partial<UserDocument> }>> {
+  ): Promise<BaseResponse<{ accessToken: string; refreshToken: string }>> {
     const { email, password } = loginDto;
     const user = await this.validateUser(email, password);
-    const token = this.generateToken(user);
+
+    const accessToken = this.generateToken(user, '15m'); // Short expiry for security
+    const refreshToken = this.generateToken(user, '7d'); // Longer expiry for refresh token
+
+    await this.userService.updateUser(user.email, { refreshToken });
+
     return {
       message: 'Login Successful',
-      data: { token, user: this.removePassword(user) },
+      data: { accessToken, refreshToken },
     };
+  }
+
+  async refreshToken(
+    refreshToken: string,
+  ): Promise<BaseResponse<{ accessToken: string; refreshToken: string }>> {
+    try {
+      const payload = this.jwtService.verify(refreshToken) as { email: string };
+      const user = await this.userService.findByEmail(payload.email);
+
+      if (!user || user.refreshToken !== refreshToken) {
+        throw new UnauthorizedException('Invalid or expired refresh token');
+      }
+
+      const newAccessToken = this.generateToken(user, '15m');
+      const newRefreshToken = this.generateToken(user, '7d');
+
+      await this.userService.updateUser(user.email, { refreshToken: newRefreshToken });
+
+      return {
+        message: 'Token refreshed successfully',
+        data: { accessToken: newAccessToken, refreshToken: newRefreshToken },
+      };
+    } catch (error) {
+      this.logger.error('Error refreshing token:', error);
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 
   async signUp(

@@ -19,6 +19,9 @@ export class User extends Document {
 
   @Prop({ required: true, default: false })
   isVerified: boolean;
+
+  @Prop({ required: false, default: '' })
+  refreshToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
