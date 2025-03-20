@@ -1,6 +1,6 @@
 {
   "name": "nestjs-api-starter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A NestJS API starter template with authentication and best practices.",
   "bin": {
     "nestjs-api-starter": "./bin/create-app.js"

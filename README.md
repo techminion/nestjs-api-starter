@@ -17,16 +17,26 @@ This is a **starter NestJS API template** with built-in **authentication** and *
 
 ## Installation & Setup
 
-### 1. Clone the Repository
+### 1. Create a New Project Using npx
+
+You can quickly scaffold a new project using `npx`:
 
 ```bash
-git clone https://github.com/techminion/nestjs-api-starter.git
-cd nestjs-api-starter
+npx nestjs-api-starter my-app
+cd my-app
+npm install
+npm run start:dev
 ```
 
-### 2. Install Dependencies
+This will create a new NestJS API project in the `my-app` directory.
+
+### 2. Manual Installation
+
+Alternatively, you can clone the repository manually:
 
 ```bash
+git clone https://github.com/your-repo/nestjs-api-starter.git
+cd nestjs-api-starter
 npm install
 ```
 
@@ -72,6 +82,8 @@ Swagger documentation is available at:
 ```
 http://localhost:3000/api/docs
 ```
+
+![Swagger UI](https://your-image-url.com/swagger-ui.png)
 
 ---
 
